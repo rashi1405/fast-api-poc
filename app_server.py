@@ -4,7 +4,9 @@ import os
 import uuid
 from typing import List, Dict
 from concurrent.futures import ThreadPoolExecutor
-from hardy_stairs.main import process_video_and_generate_report
+# from hardy_stairs.main import process_video_and_generate_report
+
+# need to change the file name on Hardy_stairs repo from hardy_stairs.main to hardy_stairs.app as it is throwing circular error, after that we can uncomment the above import and below api endpoint for /process-video/
 
 from s3_service import (
     initiate_multipart_upload,
@@ -128,47 +130,47 @@ def complete_upload(request: CompleteUploadRequest):
     return {"fileUrl": file_url}
 
 
-@app.post("/process-video/")
-def process_video(request: ProcessVideoRequest, background_tasks: BackgroundTasks):
-    """
-    Trigger processing of a video stored in S3 and generate a report CSV.
+# @app.post("/process-video/")
+# def process_video(request: ProcessVideoRequest, background_tasks: BackgroundTasks):
+#     """
+#     Trigger processing of a video stored in S3 and generate a report CSV.
 
-    **Request Body Example:**
-    {
-        "fileUrl": "s3://bucket-name/inspection_video.mp4"
-    }
+#     **Request Body Example:**
+#     {
+#         "fileUrl": "s3://bucket-name/inspection_video.mp4"
+#     }
 
-    **Response Example:**
-    {
-        "download_url": "https://s3.amazonaws.com/bucket-name/reports/1234.csv?X-Amz-Signature=..."
-    }
+#     **Response Example:**
+#     {
+#         "download_url": "https://s3.amazonaws.com/bucket-name/reports/1234.csv?X-Amz-Signature=..."
+#     }
 
-    Steps:
-    1. Generate a unique CSV report filename.
-    2. Generate a presigned S3 URL for uploading the report.
-    3. Run `process_video_and_generate_report` as a background task.
-    4. Generate a presigned download URL for the frontend to fetch the report.
-    """
-    # Generate unique report filename
-    report_file = f"reports/{uuid.uuid4()}.csv"
+#     Steps:
+#     1. Generate a unique CSV report filename.
+#     2. Generate a presigned S3 URL for uploading the report.
+#     3. Run `process_video_and_generate_report` as a background task.
+#     4. Generate a presigned download URL for the frontend to fetch the report.
+#     """
+#     # Generate unique report filename
+#     report_file = f"reports/{uuid.uuid4()}.csv"
 
-    # Presigned URL for background upload
-    presigned_upload_url = generate_presigned_url(report_file)
+#     # Presigned URL for background upload
+#     presigned_upload_url = generate_presigned_url(report_file)
 
-    # Kick off background processing task
-    background_tasks.add_task(
-        process_video_and_generate_report,
-        video_source_type="s3",
-        video_url=request.fileUrl,
-        presigned_s3_url=presigned_upload_url,
-        upload_to_s3=True
-    )
+#     # Kick off background processing task
+#     background_tasks.add_task(
+#         process_video_and_generate_report,
+#         video_source_type="s3",
+#         video_url=request.fileUrl,
+#         presigned_s3_url=presigned_upload_url,
+#         upload_to_s3=True
+#     )
 
-    # Presigned URL for frontend to download the report
-    presigned_download_url = s3_client.generate_presigned_url(
-        ClientMethod="get_object",
-        Params={"Bucket": S3_BUCKET, "Key": report_file},
-        ExpiresIn=3600
-    )
+#     # Presigned URL for frontend to download the report
+#     presigned_download_url = s3_client.generate_presigned_url(
+#         ClientMethod="get_object",
+#         Params={"Bucket": S3_BUCKET, "Key": report_file},
+#         ExpiresIn=3600
+#     )
 
-    return {"download_url": presigned_download_url}
+#     return {"download_url": presigned_download_url}

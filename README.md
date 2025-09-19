@@ -32,7 +32,7 @@ venv\Scripts\activate      # (Windows)
 pip install -r requirements.txt
 
 # 4. Run FastAPI server
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+uvicorn app_server:app --reload --host 0.0.0.0 --port 8000
 
 
 Docs available at 👉 `http://localhost:8000/docs`
